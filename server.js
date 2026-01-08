@@ -14,10 +14,7 @@ const historyRoutes = require('./routes/history');
 
 const app = express();
 
-
-// Middleware 
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+// Middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors({ origin: process.env.ALLOWED_ORIGINS || '*' }));
@@ -31,33 +28,25 @@ app.use('/api/testing', testingRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/history', historyRoutes);
 
+// Test Route للتأكد أن السيرفر يعمل أونلاين
+app.get('/', (req, res) => {
+  res.json({ message: 'Wesal Backend is running successfully!' });
+});
 
 app.use(errorHandler);
 
+// الاتصال بقاعدة البيانات
+connectDB()
+  .then(() => console.log('Connected to MongoDB Atlas'))
+  .catch(err => console.error('Database connection error:', err));
 
-const startServer = async () => {
-  // try {
-  //   await connectDB(); 
-  //   app.listen(port || 3000, () => { 
-  //     console.log(`Server is runing on port ${port || 3000}`);
-  //   });
-  // }
-  try {
-    await connectDB(); 
-    const SERVER_PORT = process.env.PORT || port || 3000; 
-    
-    app.listen(SERVER_PORT, () => { 
-      console.log(`Server is running on port ${SERVER_PORT}`);
+// هذا السطر هو الأهم لعمل المشروع على Vercel
+module.exports = app;
+
+// تشغيل السيرفر في حالة البيئة المحلية (Local)
+if (process.env.NODE_ENV !== 'production') {
+    const SERVER_PORT = process.env.PORT || port || 3000;
+    app.listen(SERVER_PORT, () => {
+        console.log(`Server is running locally on port ${SERVER_PORT}`);
     });
-  }
-   catch (err) {
-    console.error('Failed to connect with database', err);
-    process.exit(1); 
-  }
-};
-
-// app.get('/api/test', (req, res) => {
-//   res.json({ message: 'Backend Connected Successfully!' });
-// });
-
-startServer(); 
+}
