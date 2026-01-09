@@ -18,7 +18,16 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // app.use(cors({ origin: process.env.ALLOWED_ORIGINS || '*' }));
-app.use(cors({ origin: '*' }));
+// app.use(cors({ origin: '*' }));
+app.use(cors({
+  origin: [
+    'https://wesal-frontend-kappa.vercel.app',
+    'https://wesal-frontend-23ig6xorn-nada21-7s-projects.vercel.app',
+    'https://nada21-7.github.io'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Routes
 app.use('/api/auth', authRoutes);
