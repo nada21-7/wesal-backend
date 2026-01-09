@@ -1,24 +1,9 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs'); 
-const { mediaStoragePath } = require('../config');
 
-
-if (!fs.existsSync(mediaStoragePath)) {
-  fs.mkdirSync(mediaStoragePath, { recursive: true });
-  console.log(`Created uploads directory: ${mediaStoragePath}`);
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, mediaStoragePath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const fileExtension = path.extname(file.originalname);
-    cb(null, uniqueSuffix + fileExtension);
-  }
-});
+// 1. شلنا الـ fs والـ mkdirSync تماماً لأن فيرسل بيرفضهم
+// 2. استخدمنا memoryStorage بدلاً من diskStorage
+const storage = multer.memoryStorage(); 
 
 const upload = multer({
   storage,
@@ -31,7 +16,7 @@ const upload = multer({
     }
     cb(new Error('Invalid file type. Only allowed media and data files.'));
   },
-  limits: { fileSize: 100 * 1024 * 1024 }
+  limits: { fileSize: 10 * 1024 * 1024 } // ملحوظة: فيرسل ليميت الملفات فيه 4.5MB للنسخة المجانية
 });
 
-module.exports = { upload };
+module.exports = { upload };;
